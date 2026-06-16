@@ -23,7 +23,7 @@ public:
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void ToggleInventory();
 protected:
 	virtual void BeginPlay() override;
