@@ -3,15 +3,16 @@
 #include  "CoreMinimal.h"
 #include "Types/Inv_GridTypes.h"
 #include "GameplayTagContainer.h"
+#include "StructUtils/InstancedStruct.h"
 
 #include "Inv_ItemManifest.generated.h"
-
 
 /**
  * The Item Manifest contains all of the necessary data
  * for creating a new Inventory Item
  */
 
+struct FInv_ItemFragment;
 class UInv_InventoryItem;
 
 USTRUCT(BlueprintType)
@@ -24,6 +25,10 @@ struct INVENTORY_API FInv_ItemManifest
 	FGameplayTag GetItemType() const { return ItemType; }
 	
 private:
+	
+	UPROPERTY(EditAnywhere, Category = "Inventory", meta=(ExcludeBaseStruct))
+	TArray<TInstancedStruct<FInv_ItemFragment>> Fragments;
+	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	EInv_ItemCategory ItemCategory {EInv_ItemCategory::None};
 	
