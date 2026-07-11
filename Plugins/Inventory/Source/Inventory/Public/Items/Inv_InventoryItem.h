@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Items/Manifest/Inv_ItemManifest.h"
+#include "StructUtils/InstancedStruct.h"
 
 #include "Inv_InventoryItem.generated.h"
 
