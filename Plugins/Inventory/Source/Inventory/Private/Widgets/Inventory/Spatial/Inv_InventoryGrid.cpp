@@ -36,6 +36,13 @@ FInv_SlotAvailabilityResult UInv_InventoryGrid::HasRoomForItem(const FInv_ItemMa
 {
 	FInv_SlotAvailabilityResult Result;
 	Result.TotalRoomToFill = 1;
+	
+	FInv_SlotAvailability SlotAvailability;
+	SlotAvailability.AmountToFill = 1;
+	SlotAvailability.Index = 0;
+	
+	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability));
+	
 	return Result;
 }
 
@@ -45,7 +52,15 @@ void UInv_InventoryGrid::AddItem(UInv_InventoryItem* Item)
 	
 	FInv_SlotAvailabilityResult Result = HasRoomForItem(Item);
 	
-	//TODO: Create a widget to show the item icon and add it to the correct spot on the grid.
+	AddItemToIndices(Result, Item);
+}
+
+void UInv_InventoryGrid::AddItemToIndices(const FInv_SlotAvailabilityResult& Result, UInv_InventoryItem* NewItem)
+{
+	//Get Grid Fragment so we know how many grid spaces the item takes.
+	//Get Image Fragment so we have an image to show
+	//Create a widget to add to the grid
+	//Store the new widget in a container
 }
 
 void UInv_InventoryGrid::ConstructGrid()
