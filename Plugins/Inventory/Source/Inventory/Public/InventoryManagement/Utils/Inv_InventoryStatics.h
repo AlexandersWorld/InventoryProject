@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Widgets/Utils/Inv_WidgetUtils.h"
 #include "Inv_InventoryStatics.generated.h"
 
 enum class EInv_ItemCategory : uint8;
@@ -25,4 +26,24 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	static EInv_ItemCategory GetItemCategoryFromComp(UInv_ItemComponent* ItemComponent);
+	
+	template<typename T, typename FuncT>
+	static void ForEach2D(TArray<T>& Array, int32 Index, const FIntPoint& Range2D, int32 GridColumns, const FuncT& Function);
+};
+
+template<typename T, typename FuncT>
+void UInv_InventoryStatics::ForEach2D(TArray<T>& Array, int32 Index, const FIntPoint& Range2D, int32 GridColumns, const FuncT& Function)
+{
+	for (int32 i = 0; i < Range2D.Y; ++i)
+	{
+		for (int32 j = 0; j < Range2D.X; ++j)
+		{
+			const FIntPoint Coordinates = UInv_WidgetUtils::GetPositionFromIndex(Index, GridColumns) + FIntPoint(j, i);
+			const int32 TileIndex = UInv_WidgetUtils::GetIndexFromPosition(Coordinates, GridColumns);
+			if (Array.IsValidIndex(TileIndex))
+			{
+				Function(Array[TileIndex]);
+			}
+		}
+	}	
 };
