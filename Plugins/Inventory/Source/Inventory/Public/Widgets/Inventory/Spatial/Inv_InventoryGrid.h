@@ -47,6 +47,7 @@ private:
 		const FInv_GridFragment* GridFragment,
 		const FInv_IconFragment* IconFragment,
 		const int32 Index);
+	void AddSlottedItemToCanvas(const int32 Index, const FInv_GridFragment* GridFragment, UInv_SlottedItem* SlottedItem) const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "Inventory")
 	EInv_ItemCategory ItemCategory;
@@ -62,6 +63,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UInv_SlottedItem> SlottedItemClass;
+	
+	TMap<int32, TObjectPtr<UInv_SlottedItem>> SlottedItems;
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 Rows;
