@@ -2,8 +2,10 @@
 
 #include "InventoryManagement/Components/Inv_InventoryComponent.h"
 
+#include "Items/Components/Inv_ItemComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Widgets/Inventory/InventoryBase/Inv_InventoryBase.h"
+#include "Items/Inv_InventoryItem.h"
 
 UInv_InventoryComponent::UInv_InventoryComponent() : InventoryList(this)
 {
@@ -23,6 +25,9 @@ void UInv_InventoryComponent::TryAddItem(UInv_ItemComponent* ItemComponent)
 {
 	FInv_SlotAvailabilityResult Result = InventoryMenu->HasRoomForItem(ItemComponent);
 	
+	UInv_InventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemComponent->GetItemManifest().GetItemType());
+	Result.Item = FoundItem;
+	
 	if (Result.TotalRoomToFill == 0)
 	{
 		NoRoomInInventory.Broadcast();
@@ -34,10 +39,10 @@ void UInv_InventoryComponent::TryAddItem(UInv_ItemComponent* ItemComponent)
 		//Add stacks to an item that already exists in the inventory
 		//not create a new item of this type
 		Server_AddStacksToItem(ItemComponent, Result.TotalRoomToFill, Result.Remainder);
-	}
+	}     
 	else if (Result.TotalRoomToFill > 0)
 	{
-		//This item type desn't exist in the inventory. Create a new one and update all pertinent slots.
+		//This item type doesn't exist in the inventory. Create a new one and update all pertinent slots.
 		Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0);
 	}
 }
