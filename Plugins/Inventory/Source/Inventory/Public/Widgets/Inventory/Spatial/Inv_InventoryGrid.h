@@ -16,8 +16,7 @@ class UInv_InventoryComponent;
 class UInv_GridSlot;
 class UCanvasPanel;
 class UInv_InventoryItem;
-class FGameplayTag;
-
+struct FGameplayTag;
 
 UCLASS()
 class INVENTORY_API UInv_InventoryGrid : public UUserWidget
@@ -69,6 +68,7 @@ private:
 	bool HasValidItem(const UInv_GridSlot* GridSlot) const;
 	bool IsUpperLeftSlot(const UInv_GridSlot* GridSlot, const UInv_GridSlot* SubGridSlot) const;
 	bool DoesItemTypeMatch(const UInv_InventoryItem* SubItem, const FGameplayTag& ItemType) const;
+	bool IsInGridBounds(const int32 StartIndex, const FIntPoint& ItemDimension) const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess="true"), Category = "Inventory")
 	EInv_ItemCategory ItemCategory;
@@ -95,6 +95,4 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	float TileSize;
-	
-	
 };
