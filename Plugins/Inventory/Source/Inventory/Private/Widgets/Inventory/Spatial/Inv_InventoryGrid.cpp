@@ -649,20 +649,46 @@ void UInv_InventoryGrid::ConstructGrid()
 		for (int32 i = 0; i < Columns; ++i)
 		{
 			UInv_GridSlot* GridSlot = CreateWidget<UInv_GridSlot>(this, GridSlotClass);
-			const FIntPoint TilePosition(i,j);
-			
-			int32 Index = UInv_WidgetUtils::GetIndexFromPosition(TilePosition, Columns);
-			GridSlot->SetIndex(Index);
-			
 			CanvasPanel->AddChild(GridSlot);
 			
-			UCanvasPanelSlot* GridCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(GridSlot);
+			const FIntPoint TilePosition(i,j);
+			GridSlot->SetIndex(UInv_WidgetUtils::GetIndexFromPosition(TilePosition, Columns));
 			
+			UCanvasPanelSlot* GridCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(GridSlot);
 			GridCPS->SetSize(FVector2D(TileSize));
 			GridCPS->SetPosition(TilePosition * TileSize);
 			
 			GridSlots.Add(GridSlot);
+			GridSlot->GridSlotClicked.AddDynamic(this, &ThisClass::UInv_InventoryGrid::OnGridSlotClicked);
+			GridSlot->GridSlotHovered.AddDynamic(this, &ThisClass::UInv_InventoryGrid::OnGridSlotHovered);
+			GridSlot->GridSlotUnhovered.AddDynamic(this, &ThisClass::UInv_InventoryGrid::OnGridSlotUnhovered);
 		}
+	}
+}
+
+void UInv_InventoryGrid::OnGridSlotClicked(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+}
+
+void UInv_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	if (IsValid(HoverItem)) return;
+	
+	UInv_GridSlot* GridSlot = GridSlots[GridIndex];
+	if (GridSlot->IsAvailable())
+	{
+		GridSlot->SetOccupiedTexture();
+	}
+}
+
+void UInv_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	if (IsValid(HoverItem)) return;
+	
+	UInv_GridSlot* GridSlot = GridSlots[GridIndex];
+	if (GridSlot->IsAvailable())
+	{
+		GridSlot->SetUnoccupiedTexture();
 	}
 }
 
