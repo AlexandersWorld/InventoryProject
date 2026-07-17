@@ -953,7 +953,7 @@ void UInv_InventoryGrid::OnPopUpMenuSplit(int32 SplitAmount, int32 Index)
 	HoverItem->UpdateStackCount(SplitAmount);
 }
 
-void UInv_InventoryGrid::OnPopUpMenuConsume(int32 Index)
+void UInv_InventoryGrid::OnPopUpMenuDrop(int32 Index)
 {
 	UInv_InventoryItem* RightClickedItem = GridSlots[Index]->GetInventoryItem().Get();
 	if (!IsValid(RightClickedItem)) return;
@@ -962,8 +962,9 @@ void UInv_InventoryGrid::OnPopUpMenuConsume(int32 Index)
 	DropItem();
 }
 
-void UInv_InventoryGrid::OnPopUpMenuDrop(int32 Index)
+void UInv_InventoryGrid::OnPopUpMenuConsume(int32 Index)
 {
+
 }
 
 void UInv_InventoryGrid::DropItem()
