@@ -19,6 +19,9 @@ class INVENTORY_API UInv_SpatialInventory : public UInv_InventoryBase
 public:
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual void OnItemHovered(UInv_InventoryItem* Item) override;
+	virtual void OnItemUnhovered() override;
+	virtual bool HasHoverItem() const override;
 	
 	virtual FInv_SlotAvailabilityResult HasRoomForItem(UInv_ItemComponent* ItemComponent) const override;
 private:

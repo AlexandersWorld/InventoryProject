@@ -913,6 +913,11 @@ void UInv_InventoryGrid::SetOwningCanvas(UCanvasPanel* OwningCanvas)
 	OwningCanvasPanel = OwningCanvas;
 }
 
+bool UInv_InventoryGrid::HasHoverItem() const
+{
+	return IsValid(HoverItem);
+}
+
 void UInv_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)
 {
 	if (IsValid(HoverItem)) return;

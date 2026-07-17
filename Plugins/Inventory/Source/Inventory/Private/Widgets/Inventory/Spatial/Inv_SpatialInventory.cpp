@@ -30,6 +30,24 @@ FReply UInv_SpatialInventory::NativeOnMouseButtonDown(const FGeometry& InGeometr
 	return FReply::Handled();
 }
 
+void UInv_SpatialInventory::OnItemHovered(UInv_InventoryItem* Item)
+{
+	Super::OnItemHovered(Item);
+}
+
+void UInv_SpatialInventory::OnItemUnhovered()
+{
+	Super::OnItemUnhovered();
+}
+
+bool UInv_SpatialInventory::HasHoverItem() const
+{
+	if (Grid_Equippables->HasHoverItem()) return true;
+	if (Grid_Consumables->HasHoverItem()) return true;
+	if (Grid_Craftables->HasHoverItem()) return true;
+	return false;
+}
+
 FInv_SlotAvailabilityResult UInv_SpatialInventory::HasRoomForItem(UInv_ItemComponent* ItemComponent) const
 {
 	switch (UInv_InventoryStatics::GetItemCategoryFromComp(ItemComponent))
