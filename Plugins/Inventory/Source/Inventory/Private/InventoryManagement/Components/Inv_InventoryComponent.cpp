@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Widgets/Inventory/InventoryBase/Inv_InventoryBase.h"
 #include "Items/Inv_InventoryItem.h"
+#include "Items/Fragments/Inv_FragmentTags.h"
 #include "Items/Fragments/Inv_ItemFragment.h"
 
 UInv_InventoryComponent::UInv_InventoryComponent() : InventoryList(this)
@@ -123,9 +124,10 @@ void UInv_InventoryComponent::Server_ConsumeItem_Implementation(UInv_InventoryIt
 	{
 		Item->SetTotalStackCount(NewStackCount);
 	}
-	
-	// TODO: Get the consumable fragment and call Consume()
-	// (Actually create the Consumable Fragment)
+	if (FInv_ConsumableFragment* ConsumableFragment = Item->GetItemManifestMutable().GetFragmentOfTypeMutable<FInv_ConsumableFragment>())
+	{
+		ConsumableFragment->OnConsume(OwningController.Get());
+	}
 }
 
 void UInv_InventoryComponent::ToggleInventoryMenu()
