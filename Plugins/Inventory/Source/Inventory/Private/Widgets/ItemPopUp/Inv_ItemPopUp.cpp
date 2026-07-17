@@ -17,7 +17,7 @@ void UInv_ItemPopUp::NativeOnInitialized()
 	Button_Drop->OnClicked.AddDynamic(this, &ThisClass::DropButtonClicked);
 	Button_Consume->OnClicked.AddDynamic(this, &ThisClass::ConsumeButtonClicked);
 	Slider_Split->OnValueChanged.AddDynamic(this, &ThisClass::UInv_ItemPopUp::SliderValueChanged);
-}
+} 
 
 void UInv_ItemPopUp::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
