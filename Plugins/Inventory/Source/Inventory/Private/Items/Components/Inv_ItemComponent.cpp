@@ -17,6 +17,10 @@ void UInv_ItemComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 	DOREPLIFETIME(ThisClass, ItemManifest);
 }
 
+void UInv_ItemComponent::InitItemManifest(FInv_ItemManifest CopyOfManifest)
+{
+}
+
 void UInv_ItemComponent::PickedUp()
 {
 	OnPickedUp();
