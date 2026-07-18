@@ -10,6 +10,7 @@
 enum class EInv_ItemCategory : uint8;
 class UInv_InventoryComponent;
 class UInv_ItemComponent;
+class UInv_InventoryItem;
 
 /**
  * 
@@ -29,6 +30,12 @@ public:
 	
 	template<typename T, typename FuncT>
 	static void ForEach2D(TArray<T>& Array, int32 Index, const FIntPoint& Range2D, int32 GridColumns, const FuncT& Function);
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static void ItemHovered(APlayerController* PlayerController, UInv_InventoryItem* Item);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static void ItemUnHovered(APlayerController* PlayerController);
 };
 
 template<typename T, typename FuncT>
