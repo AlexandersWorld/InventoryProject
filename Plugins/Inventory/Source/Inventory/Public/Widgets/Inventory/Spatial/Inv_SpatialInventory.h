@@ -27,6 +27,7 @@ public:
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 private:
 	
@@ -77,7 +78,8 @@ private:
 	void ShowCraftables();
 	
 	void DisableButton(UButton* Button);
-
+	void SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const;
 	void SetActiveGrid(UInv_InventoryGrid* Grid, UButton* Button);
+	
 	TWeakObjectPtr<UInv_InventoryGrid> ActiveGrid;
 };
