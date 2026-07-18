@@ -26,9 +26,6 @@ class INVENTORY_API UInv_InventoryGrid : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	virtual void NativeOnInitialized() override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	
 	EInv_ItemCategory GetItemCategory() const { return ItemCategory; }
 	FInv_SlotAvailabilityResult HasRoomForItem(const UInv_ItemComponent* ItemComponent);
 	
@@ -40,6 +37,11 @@ public:
 	void DropItem();
 	void SetOwningCanvas(UCanvasPanel* OwningCanvas);
 	bool HasHoverItem() const;
+	
+protected:
+	virtual void NativeOnInitialized() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 private:
 	TWeakObjectPtr<UInv_InventoryComponent> InventoryComponent;
 	TWeakObjectPtr<UCanvasPanel> OwningCanvasPanel;
@@ -110,7 +112,6 @@ private:
 	bool ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const;
 	void FillInStack(const int32 FillAmount, const int32 Remainder, const int32 Index);
 	void CreateItemPopUp(const int32 GridIndex);
-	
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UInv_ItemPopUp> ItemPopUpClass;

@@ -15,7 +15,7 @@ FReply UInv_SlottedItem::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 
 void UInv_SlottedItem::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	UInv_InventoryStatics::ItemHovered(GetOwningPlayer(), InventoryItem.Get()());
+	UInv_InventoryStatics::ItemHovered(GetOwningPlayer(), InventoryItem.Get());
 }
 
 void UInv_SlottedItem::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
