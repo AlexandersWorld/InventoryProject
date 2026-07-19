@@ -104,7 +104,7 @@ template <typename T> requires std::derived_from<T, FInv_ItemFragment>
 TArray<const T*> FInv_ItemManifest::GetAllFragmentsOfType() const
 {
 	TArray<const T*> Result;
-	for (auto& Fragment : Fragments)
+	for (const TInstancedStruct<FInv_ItemFragment>& Fragment : Fragments)
 	{
 		if (const T* FragmentPtr = Fragment.GetPtr<T>())
 		{
