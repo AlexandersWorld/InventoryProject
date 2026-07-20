@@ -8,7 +8,7 @@
 #include "Inv_CompositeBase.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class INVENTORY_API UInv_CompositeBase : public UUserWidget

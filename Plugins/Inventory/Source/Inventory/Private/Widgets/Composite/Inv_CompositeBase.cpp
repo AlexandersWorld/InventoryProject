@@ -9,5 +9,5 @@ void UInv_CompositeBase::Collapse()
 
 void UInv_CompositeBase::Expand()
 {
-	SetVisibility(ESlateVisibility::Collapsed);
+	SetVisibility(ESlateVisibility::Visible);
 }
