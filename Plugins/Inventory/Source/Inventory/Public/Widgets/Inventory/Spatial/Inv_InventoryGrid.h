@@ -37,6 +37,7 @@ public:
 	void DropItem();
 	void SetOwningCanvas(UCanvasPanel* OwningCanvas);
 	bool HasHoverItem() const;
+	UInv_HoverItem* GetHoverItem() const { return HoverItem; }
 	
 protected:
 	virtual void NativeOnInitialized() override;

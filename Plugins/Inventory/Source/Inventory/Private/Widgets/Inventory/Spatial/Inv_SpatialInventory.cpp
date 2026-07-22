@@ -105,6 +105,13 @@ bool UInv_SpatialInventory::HasHoverItem() const
 	return false;
 }
 
+UInv_HoverItem* UInv_SpatialInventory::GetHoverItem() const
+{
+	if (!ActiveGrid.IsValid()) return nullptr;
+	
+	return ActiveGrid->GetHoverItem();
+}
+
 FInv_SlotAvailabilityResult UInv_SpatialInventory::HasRoomForItem(UInv_ItemComponent* ItemComponent) const
 {
 	switch (UInv_InventoryStatics::GetItemCategoryFromComp(ItemComponent))

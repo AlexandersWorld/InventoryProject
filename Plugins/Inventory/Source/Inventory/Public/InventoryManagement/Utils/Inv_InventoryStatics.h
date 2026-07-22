@@ -7,6 +7,7 @@
 #include "Widgets/Utils/Inv_WidgetUtils.h"
 #include "Inv_InventoryStatics.generated.h"
 
+class UInv_HoverItem;
 enum class EInv_ItemCategory : uint8;
 class UInv_InventoryComponent;
 class UInv_ItemComponent;
@@ -36,6 +37,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	static void ItemUnHovered(APlayerController* PlayerController);
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static UInv_HoverItem* GetHoverItem(APlayerController* PlayerController);
 };
 
 template<typename T, typename FuncT>
