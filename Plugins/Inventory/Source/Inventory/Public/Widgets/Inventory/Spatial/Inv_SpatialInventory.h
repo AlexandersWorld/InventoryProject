@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/Inventory/InventoryBase/Inv_InventoryBase.h"
+#include "GameplayTagContainer.h"
 #include "Inv_SpatialInventory.generated.h"
 
+class UInv_EquippedGridSlot;
 class UInv_ItemDescription;
 class UCanvasPanel;
 class UInv_InventoryGrid;
@@ -30,6 +32,8 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 private:
+	UPROPERTY()
+	TArray<TObjectPtr<UInv_EquippedGridSlot>> EquippedGridSlots;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
@@ -76,6 +80,9 @@ private:
 	
 	UFUNCTION()
 	void ShowCraftables();
+	
+	UFUNCTION()
+	void EquippedGridSlotClicked(UInv_EquippedGridSlot* GridSlot, const FGameplayTag& EquippedTypeTag);
 	
 	void DisableButton(UButton* Button);
 	void SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const;
