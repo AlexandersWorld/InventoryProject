@@ -88,6 +88,7 @@ private:
 	void DisableButton(UButton* Button);
 	void SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const;
 	void SetActiveGrid(UInv_InventoryGrid* Grid, UButton* Button);
+	bool CanEquipHoverItem(UInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag) const;
 	
 	TWeakObjectPtr<UInv_InventoryGrid> ActiveGrid;
 };
