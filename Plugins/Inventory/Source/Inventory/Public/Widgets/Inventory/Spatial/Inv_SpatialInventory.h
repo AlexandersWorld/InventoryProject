@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "Inv_SpatialInventory.generated.h"
 
+class UInv_EquippedSlottedItem;
 class UInv_EquippedGridSlot;
 class UInv_ItemDescription;
 class UCanvasPanel;
@@ -23,6 +24,7 @@ public:
 	virtual void OnItemHovered(UInv_InventoryItem* Item) override;
 	virtual void OnItemUnhovered() override;
 	virtual bool HasHoverItem() const override;
+	virtual float GetTileSize() const override;
 	virtual UInv_HoverItem* GetHoverItem() const override;
 	
 	virtual FInv_SlotAvailabilityResult HasRoomForItem(UInv_ItemComponent* ItemComponent) const override;
@@ -31,7 +33,6 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UInv_EquippedGridSlot>> EquippedGridSlots;
@@ -83,7 +84,11 @@ private:
 	void ShowCraftables();
 	
 	UFUNCTION()
-	void EquippedGridSlotClicked(UInv_EquippedGridSlot* GridSlot, const FGameplayTag& EquippedTypeTag);
+	void EquippedGridSlotClicked(UInv_EquippedGridSlot* GridSlot, const FGameplayTag& EquipmentTypeTag);
+	
+	UFUNCTION()
+	void EquippedSlottedItemClicked(UInv_EquippedSlottedItem* SlottedItem);
+
 	
 	void DisableButton(UButton* Button);
 	void SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const;

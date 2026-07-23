@@ -12,6 +12,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquippedGridSlotClicked, UInv_Equi
                                              const FGameplayTag&, EquipmentTypeTag);
 
 class UImage;
+class UOverlay;
 
 UCLASS()
 class INVENTORY_API UInv_EquippedGridSlot : public UInv_GridSlot
@@ -38,4 +39,7 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UInv_EquippedSlottedItem> EquippedSlottedItem;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UOverlay> Overlay_Root;
 };

@@ -38,6 +38,7 @@ public:
 	void SetOwningCanvas(UCanvasPanel* OwningCanvas);
 	bool HasHoverItem() const;
 	UInv_HoverItem* GetHoverItem() const { return HoverItem; }
+	float GetTileSize() const { return TileSize; }
 	
 protected:
 	virtual void NativeOnInitialized() override;

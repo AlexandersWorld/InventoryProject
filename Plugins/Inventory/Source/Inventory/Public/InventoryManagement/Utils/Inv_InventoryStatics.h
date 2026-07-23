@@ -12,6 +12,7 @@ enum class EInv_ItemCategory : uint8;
 class UInv_InventoryComponent;
 class UInv_ItemComponent;
 class UInv_InventoryItem;
+class UInv_InventoryBase;
 
 /**
  * 
@@ -40,6 +41,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	static UInv_HoverItem* GetHoverItem(APlayerController* PlayerController);
+	
+	static UInv_InventoryBase* GetInventoryWidget(APlayerController* PlayerController);
 };
 
 template<typename T, typename FuncT>

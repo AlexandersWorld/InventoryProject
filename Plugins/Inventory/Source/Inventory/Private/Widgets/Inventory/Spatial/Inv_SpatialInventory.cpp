@@ -14,6 +14,7 @@
 #include "Blueprint/WidgetTree.h"
 #include "Widgets/Inventory/GridSlots/Inv_EquippedGridSlot.h"
 #include "Widgets/Inventory/HoverItem/Inv_HoverItem.h"
+#include "Widgets/Inventory/SlottedItems/Inv_EquippedSlottedItem.h"
 #include "Widgets/ItemDescription/Inv_ItemDescription.h"
 
 void UInv_SpatialInventory::NativeOnInitialized()
@@ -41,16 +42,29 @@ void UInv_SpatialInventory::NativeOnInitialized()
 }
 
 void UInv_SpatialInventory::EquippedGridSlotClicked(UInv_EquippedGridSlot* GridSlot,
-	const FGameplayTag& EquippedTypeTag)
+	const FGameplayTag& EquipmentTypeTag)
 {
 	// Check to see if we can equip the Hover Item
-	if (!CanEquipHoverItem(GridSlot, EquippedTypeTag)) return;
+	if (!CanEquipHoverItem(GridSlot, EquipmentTypeTag)) return;
+	
+	UInv_HoverItem* HoverItem = GetHoverItem();
 	
 	// Create an Equipped Slotted Item and add it to the Equipped Grid Slot (call EquippedGridSlot->OnItemEquipped())
-	
+	const float TileSize = UInv_InventoryStatics::GetInventoryWidget(GetOwningPlayer())->GetTileSize();
+	UInv_EquippedSlottedItem* EquippedSlottedItem = GridSlot->OnItemEquipped(
+		HoverItem->GetInventoryItem(),
+		EquipmentTypeTag,
+		TileSize
+	);
+	EquippedSlottedItem->OnEquippedSlottedItemClicked.AddDynamic(this, &ThisClass::UInv_SpatialInventory::EquippedSlottedItemClicked);
 	
 	// Clear  the Hover Item
 	// Inform the server that we've equipped an item (potentially unequipping an item as well)
+}
+
+void UInv_SpatialInventory::EquippedSlottedItemClicked(UInv_EquippedSlottedItem* SlottedItem)
+{
+	
 }
 
 FReply UInv_SpatialInventory::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -65,6 +79,11 @@ void UInv_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDelt
 	
 	if (!IsValid(ItemDescription)) return;
 	SetItemDescriptionSizeAndPosition(ItemDescription, CanvasPanel);
+}
+
+float UInv_SpatialInventory::GetTileSize() const
+{
+	return Grid_Equippables->GetTileSize();
 }
 
 void UInv_SpatialInventory::SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const
