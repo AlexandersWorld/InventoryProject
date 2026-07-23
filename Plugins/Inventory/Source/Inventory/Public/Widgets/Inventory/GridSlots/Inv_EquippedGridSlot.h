@@ -7,10 +7,11 @@
 #include "GameplayTagContainer.h"
 #include "Inv_EquippedGridSlot.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquippedGridSlotClicked, UInv_EquippedGridSlot*, GridSlot, const FGameplayTag&, EquipmentTypeTag);
+class UInv_EquippedSlottedItem;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquippedGridSlotClicked, UInv_EquippedGridSlot*, GridSlot,
+                                             const FGameplayTag&, EquipmentTypeTag);
 
 class UImage;
-class UInv_EquippedSlottedItem;
 
 UCLASS()
 class INVENTORY_API UInv_EquippedGridSlot : public UInv_GridSlot
@@ -31,4 +32,10 @@ private:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_GrayedOutIcon;
+	
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TSubclassOf<UInv_EquippedSlottedItem> EquippedSlottedItemClass;
+	
+	UPROPERTY()
+	TObjectPtr<UInv_EquippedSlottedItem> EquippedSlottedItem;
 };
