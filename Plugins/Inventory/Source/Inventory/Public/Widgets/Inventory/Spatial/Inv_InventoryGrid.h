@@ -32,12 +32,14 @@ public:
 	UFUNCTION()
 	void AddItem(UInv_InventoryItem* Item);
 	
+	void ClearHoverItem();
 	void ShowCursor();
 	void HideCursor();
 	void DropItem();
 	void SetOwningCanvas(UCanvasPanel* OwningCanvas);
 	bool HasHoverItem() const;
-	
+	UInv_HoverItem* GetHoverItem() const;
+	float GetTileSize() const { return TileSize; }
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
@@ -100,7 +102,6 @@ private:
 	void UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions);
 	void ChangeHoverType(const int32 Index, const FIntPoint& Dimensions, EInv_GridSlotState GridSlotState);
 	void PutDownOnIndex(const int32 Index);
-	void ClearHoverItem();
 	UUserWidget* GetVisibleCursorWidget();
 	UUserWidget* GetHiddenCursorWidget();
 	bool IsSameStackable(const UInv_InventoryItem* ClickedInventoryItem) const;

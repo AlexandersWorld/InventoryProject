@@ -11,6 +11,11 @@
 #include "InventoryManagement/Utils/Inv_InventoryStatics.h"
 #include "Items/Inv_InventoryItem.h"
 #include "Widgets/Inventory/Spatial/Inv_InventoryGrid.h"
+#include "Blueprint/WidgetTree.h"
+#include "InventoryManagement/Components/Inv_InventoryComponent.h"
+#include "Widgets/Inventory/GridSlots/Inv_EquippedGridSlot.h"
+#include "Widgets/Inventory/HoverItem/Inv_HoverItem.h"
+#include "Widgets/Inventory/SlottedItems/Inv_EquippedSlottedItem.h"
 #include "Widgets/ItemDescription/Inv_ItemDescription.h"
 
 void UInv_SpatialInventory::NativeOnInitialized()
@@ -26,6 +31,52 @@ void UInv_SpatialInventory::NativeOnInitialized()
 	Grid_Craftables->SetOwningCanvas(CanvasPanel);
 	
 	ShowEquippables();
+	
+	WidgetTree->ForEachWidget([this](UWidget* Widget)
+	{
+		UInv_EquippedGridSlot* EquippedGridSlot = Cast<UInv_EquippedGridSlot>(Widget);
+		if (IsValid(EquippedGridSlot))
+		{
+			EquippedGridSlots.Add(EquippedGridSlot);
+		}
+	});
+}
+
+void UInv_SpatialInventory::EquippedGridSlotClicked(UInv_EquippedGridSlot* EquippedGridSlot,
+	const FGameplayTag& EquipmentTypeTag)
+{
+	// Check to see if we can equip the Hover Item
+	if (!CanEquipHoverItem(EquippedGridSlot, EquipmentTypeTag)) return;
+	
+	UInv_HoverItem* HoverItem = GetHoverItem();
+	
+	// Create an Equipped Slotted Item and add it to the Equipped Grid Slot (call EquippedGridSlot->OnItemEquipped())
+	const float TileSize = UInv_InventoryStatics::GetInventoryWidget(GetOwningPlayer())->GetTileSize();
+	UInv_EquippedSlottedItem* EquippedSlottedItem = EquippedGridSlot->OnItemEquipped(
+		HoverItem->GetInventoryItem(),
+		EquipmentTypeTag,
+		TileSize
+	);
+	EquippedSlottedItem->OnEquippedSlottedItemClicked.AddDynamic(this,  &ThisClass::EquippedSlottedItemClicked);
+	
+	// Clear  the Hover Item
+	Grid_Equippables->ClearHoverItem();
+	
+	// Inform the server that we've equipped an item (potentially unequipping an item as well)
+	UInv_InventoryComponent* InventoryComponent = UInv_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
+	check(IsValid(InventoryComponent));
+	
+	InventoryComponent->Server_EquipSlotClicked(HoverItem->GetInventoryItem(), nullptr);
+	
+	if (GetOwningPlayer()->GetNetMode() == NM_DedicatedServer)
+	{
+		InventoryComponent->OnItemEquipped.Broadcast(HoverItem->GetInventoryItem());
+	}
+}
+
+void UInv_SpatialInventory::EquippedSlottedItemClicked(UInv_EquippedSlottedItem* SlottedItem)
+{
+	
 }
 
 FReply UInv_SpatialInventory::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -40,6 +91,11 @@ void UInv_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDelt
 	
 	if (!IsValid(ItemDescription)) return;
 	SetItemDescriptionSizeAndPosition(ItemDescription, CanvasPanel);
+}
+
+float UInv_SpatialInventory::GetTileSize() const
+{
+	return Grid_Equippables->GetTileSize();
 }
 
 void UInv_SpatialInventory::SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const
@@ -87,6 +143,13 @@ bool UInv_SpatialInventory::HasHoverItem() const
 	if (Grid_Consumables->HasHoverItem()) return true;
 	if (Grid_Craftables->HasHoverItem()) return true;
 	return false;
+}
+
+UInv_HoverItem* UInv_SpatialInventory::GetHoverItem() const
+{
+	if (!ActiveGrid.IsValid()) return nullptr;
+	
+	return ActiveGrid->GetHoverItem();
 }
 
 FInv_SlotAvailabilityResult UInv_SpatialInventory::HasRoomForItem(UInv_ItemComponent* ItemComponent) const
@@ -145,5 +208,22 @@ void UInv_SpatialInventory::SetActiveGrid(UInv_InventoryGrid* Grid, UButton* But
 	if (ActiveGrid.IsValid()) ActiveGrid->ShowCursor();
 	DisableButton(Button);
 	Switcher->SetActiveWidget(Grid);
+}
+
+bool UInv_SpatialInventory::CanEquipHoverItem(UInv_EquippedGridSlot* EquippedGridSlot,
+	const FGameplayTag& EquipmentTypeTag) const
+{
+	if (!IsValid(EquippedGridSlot) || EquippedGridSlot->GetInventoryItem().IsValid()) return false;
+	
+	UInv_HoverItem* HoverItem = GetHoverItem();
+	if (!IsValid(HoverItem)) return false;
+	
+	UInv_InventoryItem* HeldItem = HoverItem->GetInventoryItem();
+	
+	return HasHoverItem() &&
+		IsValid(HeldItem) &&
+			!HoverItem->IsStackable() &&
+				HeldItem->GetItemManifest().GetItemCategory() == EInv_ItemCategory::Equippable &&
+					HeldItem->GetItemManifest().GetItemType().MatchesTag(EquipmentTypeTag);
 }
 

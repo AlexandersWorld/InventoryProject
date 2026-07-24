@@ -4,14 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/Inventory/InventoryBase/Inv_InventoryBase.h"
+#include "GameplayTagContainer.h"
 #include "Inv_SpatialInventory.generated.h"
 
+class UInv_EquippedSlottedItem;
+class UInv_EquippedGridSlot;
 class UInv_ItemDescription;
 class UCanvasPanel;
 class UInv_InventoryGrid;
 class UWidgetSwitcher;
 class UButton;
 class UInvInventoryGrid;
+class UInv_HoverItem;
 
 UCLASS()
 class INVENTORY_API UInv_SpatialInventory : public UInv_InventoryBase
@@ -21,6 +25,8 @@ public:
 	virtual void OnItemHovered(UInv_InventoryItem* Item) override;
 	virtual void OnItemUnhovered() override;
 	virtual bool HasHoverItem() const override;
+	virtual float GetTileSize() const override;
+	virtual UInv_HoverItem* GetHoverItem() const override;
 	
 	virtual FInv_SlotAvailabilityResult HasRoomForItem(UInv_ItemComponent* ItemComponent) const override;
 	
@@ -28,8 +34,9 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	
 private:
+	UPROPERTY()
+	TArray<TObjectPtr<UInv_EquippedGridSlot>> EquippedGridSlots;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
@@ -77,9 +84,17 @@ private:
 	UFUNCTION()
 	void ShowCraftables();
 	
+	UFUNCTION()
+	void EquippedGridSlotClicked(UInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag);
+	
+	UFUNCTION()
+	void EquippedSlottedItemClicked(UInv_EquippedSlottedItem* SlottedItem);
+
+	
 	void DisableButton(UButton* Button);
 	void SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const;
 	void SetActiveGrid(UInv_InventoryGrid* Grid, UButton* Button);
+	bool CanEquipHoverItem(UInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag) const;
 	
 	TWeakObjectPtr<UInv_InventoryGrid> ActiveGrid;
 };
