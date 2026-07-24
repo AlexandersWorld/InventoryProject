@@ -15,6 +15,7 @@ class UInv_InventoryGrid;
 class UWidgetSwitcher;
 class UButton;
 class UInvInventoryGrid;
+class UInv_HoverItem;
 
 UCLASS()
 class INVENTORY_API UInv_SpatialInventory : public UInv_InventoryBase
@@ -84,7 +85,7 @@ private:
 	void ShowCraftables();
 	
 	UFUNCTION()
-	void EquippedGridSlotClicked(UInv_EquippedGridSlot* GridSlot, const FGameplayTag& EquipmentTypeTag);
+	void EquippedGridSlotClicked(UInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag);
 	
 	UFUNCTION()
 	void EquippedSlottedItemClicked(UInv_EquippedSlottedItem* SlottedItem);
