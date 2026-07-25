@@ -120,7 +120,7 @@ void FInv_StrengthModifier::OnEquip(APlayerController* PlayerController)
 
 void FInv_StrengthModifier::OnUnEquip(APlayerController* PlayerController)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Item unequipped. Strength decrease by: %f"), GetValue()));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Item unequipped. Strength decrease by: %f"), GetValue()));
 }
 
 void FInv_EquipmentFragment::OnEquip(APlayerController* PlayerController)
@@ -152,5 +152,15 @@ void FInv_EquipmentFragment::Assimilate(UInv_CompositeBase* Composite) const
 	{
 		const auto& ModRef = Modifier.Get();
 		ModRef.Assimilate(Composite);
+	}
+}
+
+void FInv_EquipmentFragment::Manifest()
+{
+	FInv_InventoryItemFragment::Manifest();
+	for (auto& Modifier : EquipModifiers)
+	{
+		auto& ModRef = Modifier.GetMutable();
+		ModRef.Manifest();
 	}
 }

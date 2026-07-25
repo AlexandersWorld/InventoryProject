@@ -30,7 +30,7 @@ private:
 	void OnItemEquipped(UInv_InventoryItem* EquippedItem);
 	
 	UFUNCTION()
-	void OnItemUnequipped(UInv_InventoryItem* EquippedItem);
+	void OnItemUnequipped(UInv_InventoryItem* UnequippedItem);
 	
 	void InitInventoryComponent(); 
 };
