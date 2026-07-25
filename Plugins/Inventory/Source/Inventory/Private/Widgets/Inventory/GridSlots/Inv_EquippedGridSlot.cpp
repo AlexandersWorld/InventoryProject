@@ -50,7 +50,7 @@ UInv_EquippedSlottedItem* UInv_EquippedGridSlot::OnItemEquipped(UInv_InventoryIt
 	const FGameplayTag& EquipmentTag, float TileSize)
 {
 	// Check the Equipment Type Tag
-	if (EquipmentTag.MatchesTagExact(EquipmentTypeTag)) return nullptr;
+	if (!EquipmentTag.MatchesTagExact(EquipmentTypeTag)) return nullptr;
 	
 	// Get Grid Dimensions
 	const FInv_GridFragment* GridFragment = GetFragment<FInv_GridFragment>(Item, FragmentTags::GridFragment);
@@ -68,7 +68,7 @@ UInv_EquippedSlottedItem* UInv_EquippedGridSlot::OnItemEquipped(UInv_InventoryIt
 	EquippedSlottedItem->SetInventoryItem(Item);
 	
 	// Set the Slotted Item's Equipment Type Tag
-	EquippedSlottedItem->SetEquippedTypeTag(EquipmentTag);
+	EquippedSlottedItem->SetEquipmentTypeTag(EquipmentTag);
 	
 	// Hide the Stack Count widget on the Slotted Item
 	EquippedSlottedItem->UpdateStackCount(0);

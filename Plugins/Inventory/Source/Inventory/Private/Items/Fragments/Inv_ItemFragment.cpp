@@ -150,7 +150,7 @@ void FInv_EquipmentFragment::Assimilate(UInv_CompositeBase* Composite) const
 	FInv_InventoryItemFragment::Assimilate(Composite);
 	for (const auto& Modifier : EquipModifiers)
 	{
-		const auto& ModRef = Modifier.Get<>();
+		const auto& ModRef = Modifier.Get();
 		ModRef.Assimilate(Composite);
 	}
 }

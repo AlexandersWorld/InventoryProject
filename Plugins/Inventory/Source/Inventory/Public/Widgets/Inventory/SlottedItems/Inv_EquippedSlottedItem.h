@@ -18,8 +18,8 @@ class INVENTORY_API UInv_EquippedSlottedItem : public UInv_SlottedItem
 public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	
-	void SetEquippedTypeTag(const FGameplayTag& Tag) { EquipmentTypeTag = Tag; };	
-	FGameplayTag GetEquippedTypeTag() const { return EquipmentTypeTag; };
+	void SetEquipmentTypeTag(const FGameplayTag& Tag) { EquipmentTypeTag = Tag; };	
+	FGameplayTag GetEquipmentTypeTag() const { return EquipmentTypeTag; };
 	
 	FEquippedSlottedItemClicked OnEquippedSlottedItemClicked;
 private:
