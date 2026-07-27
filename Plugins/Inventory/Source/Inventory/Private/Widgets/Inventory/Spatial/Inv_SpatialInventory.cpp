@@ -16,6 +16,7 @@
 #include "Widgets/Inventory/GridSlots/Inv_EquippedGridSlot.h"
 #include "Widgets/Inventory/HoverItem/Inv_HoverItem.h"
 #include "GameplayTagContainer.h"
+#include "Items/Fragments/Inv_ItemFragment.h"
 #include "Widgets/Inventory/SlottedItems/Inv_EquippedSlottedItem.h"
 #include "Widgets/ItemDescription/Inv_ItemDescription.h"
 
@@ -89,7 +90,7 @@ void UInv_SpatialInventory::EquippedSlottedItemClicked(UInv_EquippedSlottedItem*
 	UInv_InventoryItem* ItemToUnequip = EquippedSlottedItem->GetInventoryItem();
 	
 	// Get the Equipped Grid Slot holding this item
-	UInv_EquippedGridSlot* EquippedGridSlot = FinDSlotWithEquippedItem(ItemToUnequip);
+	UInv_EquippedGridSlot* EquippedGridSlot = FindSlotWithEquippedItem(ItemToUnequip);
 	 
 	// Clear the equipped grid slot of this item (set it's inventory item to nullptr)
 	ClearSlotOfItem(EquippedGridSlot);
@@ -119,6 +120,7 @@ void UInv_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDelt
 	
 	if (!IsValid(ItemDescription)) return;
 	SetItemDescriptionSizeAndPosition(ItemDescription, CanvasPanel);
+	SetEquippedItemDescriptionSizeAndPosition(ItemDescription, EquippedItemDescription, CanvasPanel);
 }
 
 float UInv_SpatialInventory::GetTileSize() const
@@ -142,6 +144,26 @@ void UInv_SpatialInventory::SetItemDescriptionSizeAndPosition(UInv_ItemDescripti
 	ItemDescriptionCPS->SetPosition(ClampedPosition);
 }
 
+void UInv_SpatialInventory::SetEquippedItemDescriptionSizeAndPosition(UInv_ItemDescription* Description,
+	UInv_ItemDescription* EquippedDescription, UCanvasPanel* Canvas) const
+{
+	UCanvasPanelSlot* ItemDescriptionCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Description);
+	UCanvasPanelSlot* EquippedItemDescriptionCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(EquippedDescription);
+	if (!IsValid(ItemDescriptionCPS)|| !IsValid(EquippedItemDescriptionCPS)) return;
+	
+	const FVector2D ItemDescriptionSize = Description->GetBoxSize();
+	const FVector2D EquippedItemDescriptionSize = EquippedDescription->GetBoxSize();
+	
+	FVector2D ClampedPosition = UInv_WidgetUtils::GetClampedWidgetPosition(
+		UInv_WidgetUtils::GetWidgetSize(Canvas),
+		ItemDescriptionSize,
+		UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer()));
+	ClampedPosition.X -= EquippedItemDescriptionSize.X;
+	
+	EquippedItemDescriptionCPS->SetSize(EquippedItemDescriptionSize);
+	EquippedItemDescriptionCPS->SetPosition(ClampedPosition);
+}
+
 void UInv_SpatialInventory::OnItemHovered(UInv_InventoryItem* Item)
 {
 	const auto& Manifest = Item->GetItemManifest();
@@ -149,12 +171,18 @@ void UInv_SpatialInventory::OnItemHovered(UInv_InventoryItem* Item)
 	DescriptionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	
 	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer);
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(EquippedDescriptionTimer);
 	
 	FTimerDelegate DescriptionTimerDelegate;
-	DescriptionTimerDelegate.BindLambda([this, &Manifest, DescriptionWidget]()
+	DescriptionTimerDelegate.BindLambda([this, Item, &Manifest, DescriptionWidget]()
 	{
-		Manifest.AssimilateInventoryFragments(DescriptionWidget);
 		GetItemDescription()->SetVisibility(ESlateVisibility::HitTestInvisible);
+		Manifest.AssimilateInventoryFragments(DescriptionWidget);
+		
+		// For the second item description, showing the equipped item of this type
+		FTimerDelegate EquippedDescriptionTimerDelegate;
+		EquippedDescriptionTimerDelegate.BindUObject(this, &ThisClass::ShowEquippedItemDescription, Item);
+		GetOwningPlayer()->GetWorldTimerManager().SetTimer(EquippedDescriptionTimer, EquippedDescriptionTimerDelegate, EquippedDescriptionTimerDelay, false);
 	});
 	GetOwningPlayer()->GetWorldTimerManager().SetTimer(DescriptionTimer, DescriptionTimerDelegate, DescriptionTimerDelay, false);
 }
@@ -163,6 +191,9 @@ void UInv_SpatialInventory::OnItemUnhovered()
 {
 	GetItemDescription()->SetVisibility(ESlateVisibility::Collapsed);
 	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer);
+	
+	GetEquippedItemDescription()->SetVisibility(ESlateVisibility::Collapsed);
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(EquippedDescriptionTimer);
 }
 
 bool UInv_SpatialInventory::HasHoverItem() const
@@ -200,10 +231,54 @@ UInv_ItemDescription* UInv_SpatialInventory::GetItemDescription()
 {
 	if (!IsValid(ItemDescription))
 	{
-		ItemDescription = CreateWidget<UInv_ItemDescription>(GetOwningPlayer() ,ItemDescriptionClass);
+		ItemDescription = CreateWidget<UInv_ItemDescription>(GetOwningPlayer() , ItemDescriptionClass);
 		CanvasPanel->AddChild(ItemDescription);
 	}
 	return ItemDescription;
+}
+
+UInv_ItemDescription* UInv_SpatialInventory::GetEquippedItemDescription()
+{
+	if (!IsValid(EquippedItemDescription))
+	{
+		EquippedItemDescription = CreateWidget<UInv_ItemDescription>(GetOwningPlayer() , EquippedItemDescriptionClass);
+		CanvasPanel->AddChild(EquippedItemDescription);
+	}
+	return EquippedItemDescription;
+}
+
+void UInv_SpatialInventory::ShowEquippedItemDescription(UInv_InventoryItem* Item)
+{
+	const auto& Manifest = Item->GetItemManifest();
+	const FInv_EquipmentFragment* EquipmentFragment = Manifest.GetFragmentOfType<FInv_EquipmentFragment>();
+	if (!EquipmentFragment) return;
+	
+	const FGameplayTag HoveredEquipmentType = EquipmentFragment->GetEquipmentType();
+	
+	auto EquippedGridSlot = EquippedGridSlots.FindByPredicate([Item](const UInv_EquippedGridSlot* GridSlot)
+	{
+		return GridSlot->GetInventoryItem() == Item;
+	});
+	if (EquippedGridSlot != nullptr) return;
+	
+	auto FoundEquippedSlot = EquippedGridSlots.FindByPredicate([HoveredEquipmentType](const UInv_EquippedGridSlot* GridSlot)
+	{
+		UInv_InventoryItem* InventoryItem = GridSlot->GetInventoryItem().Get();
+		return IsValid(InventoryItem) ? InventoryItem->GetItemManifest().GetFragmentOfType<FInv_EquipmentFragment>()->GetEquipmentType() == HoveredEquipmentType : false;
+	});
+	UInv_EquippedGridSlot* EquippedSlot = FoundEquippedSlot ? *FoundEquippedSlot : nullptr;
+	if (!IsValid(EquippedSlot)) return;
+	
+	UInv_InventoryItem* EquippedItem = EquippedSlot->GetInventoryItem().Get();
+	if (!IsValid(EquippedItem)) return;
+	
+	const auto& EquippedItemManifest = EquippedItem->GetItemManifest();
+	UInv_ItemDescription* DescriptionWidget = GetEquippedItemDescription();
+	auto EquippedDescriptionWidget = GetEquippedItemDescription();
+	
+	EquippedDescriptionWidget->Collapse();
+	DescriptionWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	EquippedItemManifest.AssimilateInventoryFragments(EquippedDescriptionWidget);
 }
 
 void UInv_SpatialInventory::ShowEquippables()
@@ -259,7 +334,7 @@ bool UInv_SpatialInventory::CanEquipHoverItem(UInv_EquippedGridSlot* EquippedGri
 					HeldItem->GetItemManifest().GetItemType().MatchesTag(EquipmentTypeTag);
 }
 
-UInv_EquippedGridSlot* UInv_SpatialInventory::FinDSlotWithEquippedItem(UInv_InventoryItem* EquippedItem) const
+UInv_EquippedGridSlot* UInv_SpatialInventory::FindSlotWithEquippedItem(UInv_InventoryItem* EquippedItem) const
 {
 	auto* FoundEquippedGridSlot = EquippedGridSlots.FindByPredicate([EquippedItem](const UInv_EquippedGridSlot* GridSlot)
 	{

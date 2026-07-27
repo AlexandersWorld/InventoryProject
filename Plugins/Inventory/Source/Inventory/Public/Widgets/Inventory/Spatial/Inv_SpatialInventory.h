@@ -68,12 +68,26 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInv_ItemDescription> ItemDescription;
 	
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TSubclassOf<UInv_ItemDescription> EquippedItemDescriptionClass;
+	
+	UPROPERTY()
+	TObjectPtr<UInv_ItemDescription> EquippedItemDescription;
+	
 	UInv_ItemDescription* GetItemDescription();
+	UInv_ItemDescription* GetEquippedItemDescription();
 	
 	FTimerHandle DescriptionTimer;
+	FTimerHandle EquippedDescriptionTimer;
+	
+	UFUNCTION()
+	void ShowEquippedItemDescription(UInv_InventoryItem* Item);
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	float DescriptionTimerDelay {0.5f};
+	
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float EquippedDescriptionTimerDelay {0.5f};
 	
 	UFUNCTION()
 	void ShowEquippables();
@@ -93,9 +107,10 @@ private:
 	
 	void DisableButton(UButton* Button);
 	void SetItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UCanvasPanel* Canvas) const;
+	void SetEquippedItemDescriptionSizeAndPosition(UInv_ItemDescription* Description, UInv_ItemDescription* EquippedDescription, UCanvasPanel* Canvas) const;
 	void SetActiveGrid(UInv_InventoryGrid* Grid, UButton* Button);
 	bool CanEquipHoverItem(UInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag) const;
-	UInv_EquippedGridSlot* FinDSlotWithEquippedItem(UInv_InventoryItem* EquippedItem) const;
+	UInv_EquippedGridSlot* FindSlotWithEquippedItem(UInv_InventoryItem* EquippedItem) const;
 	void ClearSlotOfItem(UInv_EquippedGridSlot* EquippedGridSlot);
 	void RemoveEquippedSlottedItem(UInv_EquippedSlottedItem* EquippedSlottedItem);
 	void MakeEquippedSlottedItem(UInv_EquippedSlottedItem* EquippedSlottedItem, UInv_EquippedGridSlot* EquippedGridSlot, UInv_InventoryItem* ItemToEquip);

@@ -6,6 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "Inv_EquipmentComponent.generated.h"
 
+class AInv_EquipActor;
+struct FInv_ItemManifest;
+struct FInv_EquipmentFragment;
+struct FGameplayTag;
 class UInv_InventoryItem;
 class UInv_InventoryComponent;
 class APlayerController;
@@ -17,7 +21,10 @@ class INVENTORY_API UInv_EquipmentComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-
+	
+	void SetOwningSkeletalMesh(USkeletalMeshComponent* OwningMesh);
+	void SetIsProxy(bool bProxy) { bIsProxy = bProxy; }
+	void InitializeOwner(APlayerController* PlayerController);
 protected:
 	virtual void BeginPlay() override;
 	
@@ -32,5 +39,18 @@ private:
 	UFUNCTION()
 	void OnItemUnequipped(UInv_InventoryItem* UnequippedItem);
 	
-	void InitInventoryComponent(); 
+	void InitInventoryComponent();
+	void InitPlayerController();
+	AInv_EquipActor* SpawnEquippedActor(FInv_EquipmentFragment* EquipmentFragment, const FInv_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh);
+	
+	UPROPERTY()
+	TArray<TObjectPtr<AInv_EquipActor>> EquippedActors;
+	
+	AInv_EquipActor* FindEquippedActor(const FGameplayTag& EquipmentTypeTag);
+	void RemoveEquippedActor(const FGameplayTag& EquipmentTypeTag);
+	
+	UFUNCTION()
+	void OnPossessedPawnChange(APawn* OldPawn, APawn* NewPawn);
+	
+	bool bIsProxy {false};
 };

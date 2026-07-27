@@ -18,6 +18,8 @@ public:
 	
 	void InitItemManifest(FInv_ItemManifest CopyOfManifest);
 	FInv_ItemManifest GetItemManifest() const { return ItemManifest; }
+	FInv_ItemManifest GetItemManifestMutable() { return ItemManifest; }
+
 	FString GetPickupMessage() const { return PickupMessage; }
 	void PickedUp();
 protected:
